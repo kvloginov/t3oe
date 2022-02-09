@@ -29,7 +29,7 @@ const (
 	fieldUnitsWidth  = 20
 	fieldUnitsHeight = 15
 
-	unitSize = 32
+	unitSize = 64
 )
 
 func main() {
