@@ -46,14 +46,19 @@ func initImages() {
 }
 
 func (s *DrawingStuff) ToPixels(positional base.Positional) base.Positional {
-	return base.NewMovable(positional.X*float64(s.UnitSize), positional.Y*float64(s.UnitSize))
+	return base.NewPositional(positional.X*float64(s.UnitSize), positional.Y*float64(s.UnitSize), 0)
 }
 
-func (s *DrawingStuff) ToGeoM(volumeObj base.VolumeObject) ebiten.GeoM {
-	geom := ebiten.GeoM{}
-	geom.Rotate(volumeObj.Angle)
-
-	//TODO: Продолжить тут
-	return ebiten.GeoM{}
-	//return base.NewMovable(movable.X*float64(s.UnitSize), movable.Y*float64(s.UnitSize))
+func (s *DrawingStuff) ToPixelsXY(x float64, y float64) (float64, float64) {
+	return x * float64(s.UnitSize), y * float64(s.UnitSize)
 }
+
+//
+//func (s *DrawingStuff) ToGeoM(volumeObj base.VolumeObject) ebiten.GeoM {
+//	geom := ebiten.GeoM{}
+//	geom.Rotate(volumeObj.Angle)
+//
+//	//TODO: Продолжить тут
+//	return ebiten.GeoM{}
+//	//return base.NewPositional(movable.X*float64(s.UnitSize), movable.Y*float64(s.UnitSize))
+//}

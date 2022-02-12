@@ -7,9 +7,11 @@ import (
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"image/color"
+	"math"
 )
 
 type Platform struct {
+	base.Physical
 	base.VolumeObject
 	Team
 }
@@ -18,11 +20,15 @@ const FLY_MAX_SPEED = 5
 
 func NewPlatform(positional base.Positional, team Team) Platform {
 	return Platform{
+		Physical: base.Physical{
+			Positional:                   positional,
+			DragCoefficient:              0.999,
+			TurningResistanceCoefficient: 0.950,
+		},
 		VolumeObject: base.VolumeObject{
-			Positional:     positional,
 			PivotRelativeX: 0.5,
 			PivotRelativeY: 0.5,
-			Width:          1,
+			Width:          2,
 			Height:         1,
 		},
 		Team: team}
@@ -31,24 +37,24 @@ func NewPlatform(positional base.Positional, team Team) Platform {
 func (p *Platform) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff) {
 	io := &ebiten.DrawImageOptions{}
 
-	//TODO: Конечно, это нужно вынести в отдельную функцию в drawingStuff
-	shiftX := p.PivotRelativeX * p.Width
-	shiftY := p.PivotRelativeY * p.Height
-	drawingStart := base.Positional{
-		X: p.X - shiftX,
-		Y: p.Y - shiftY,
-	}
-	pixels := drawingStuff.ToPixels(drawingStart)
-
+	//scale
 	originalWidth, originalHeight := drawing.ROCKET_IMG.Size()
 	requiredWidth := p.Width * float64(drawingStuff.UnitSize)
 	requiredHeight := p.Height * float64(drawingStuff.UnitSize)
-
 	scaleX := requiredWidth / float64(originalWidth)
 	scaleY := requiredHeight / float64(originalHeight)
-
 	io.GeoM.Scale(scaleX, scaleY)
-	io.GeoM.Translate(pixels.X, pixels.Y)
+
+	//positionalByPivot
+	shiftForPivotX := -p.PivotRelativeX * p.Width
+	shiftForPivotY := -p.PivotRelativeY * p.Height
+	io.GeoM.Translate(drawingStuff.ToPixelsXY(shiftForPivotX, shiftForPivotY))
+
+	//rotate
+	io.GeoM.Rotate(p.Angle)
+
+	//move to position
+	io.GeoM.Translate(drawingStuff.ToPixelsXY(p.X, p.Y))
 
 	screen.DrawImage(drawing.ROCKET_IMG, io)
 
@@ -60,32 +66,22 @@ func (p *Platform) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff
 		B: 0x00,
 		A: 0xff,
 	})
-
 }
 
 func (p *Platform) Update(dt float64) {
-
-	// TODO: Это, конечно, должно делаться через commander-а (класс, отдающий текущие действия, например), а не напрямую
-
-	//TODO: В параметры тела
-	p.SpeedX *= 0.95
-	p.SpeedY *= 0.95
-
 	// и должна быть скорость не 1
 	if inpututil.KeyPressDuration(ebiten.KeyArrowUp) > 0 {
-		p.SpeedY = -FLY_MAX_SPEED
+		p.Speed = FLY_MAX_SPEED
 	}
 	if inpututil.KeyPressDuration(ebiten.KeyArrowDown) > 0 {
-		p.SpeedY = FLY_MAX_SPEED
+		p.Speed = -FLY_MAX_SPEED
 	}
 	if inpututil.KeyPressDuration(ebiten.KeyArrowLeft) > 0 {
-		p.SpeedX = -FLY_MAX_SPEED
+		p.TurningSpeed = -math.Pi
 	}
 	if inpututil.KeyPressDuration(ebiten.KeyArrowRight) > 0 {
-		p.SpeedX = FLY_MAX_SPEED
+		p.TurningSpeed = math.Pi
 	}
 
-	p.X += p.SpeedX * dt
-	p.Y += p.SpeedY * dt
-
+	p.Physical.Update(dt)
 }

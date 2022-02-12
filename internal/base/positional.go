@@ -1,13 +1,20 @@
 package base
 
+import "math"
+
+const (
+	ANGLE_LEFT  = math.Pi
+	ANGLE_RIGHT = 0
+	ANGLE_DOWN  = math.Pi / 2
+	ANGLE_UP    = (math.Pi * 3) / 2
+)
+
 type Positional struct {
-	X      float64
-	Y      float64
-	SpeedX float64
-	SpeedY float64
-	Angle  float64 // In radians
+	X     float64 // units
+	Y     float64 // units
+	Angle float64 // In radians
 }
 
-func NewMovable(x float64, y float64) Positional {
-	return Positional{X: x, Y: y, SpeedX: 0, SpeedY: 0, Angle: 0}
+func NewPositional(x float64, y float64, angle float64) Positional {
+	return Positional{X: x, Y: y, Angle: angle}
 }

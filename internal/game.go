@@ -28,16 +28,19 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 			unitSize),
 	}
 
-	g.platforms[0] = entities.NewPlatform(base.NewMovable(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1)), entities.TEAM_DOWN)
-	//g.platforms[1] = entities.NewPlatform(base.NewMovable(12, 5), entities.TEAM_DOWN)
+	g.platforms[0] = entities.NewPlatform(
+		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1), base.ANGLE_UP),
+		entities.TEAM_DOWN,
+	)
+	//g.platforms[1] = entities.NewPlatform(base.NewPositional(12, 5), entities.TEAM_DOWN)
 
 	return g
 }
 
 func (g *Game) Update() error {
 	//TODO: не использовать эту функцию т.к. написано, что только для дебуга.
-	tps := ebiten.CurrentTPS()
-	dt := 1 / tps
+	//tps := ebiten.CurrentTPS()
+	dt := float64(1) / 60
 
 	for i, _ := range g.platforms {
 		g.platforms[i].Update(dt)
