@@ -5,6 +5,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/resources"
+	"image/color"
 )
 
 type DrawingStuff struct {
@@ -51,6 +52,50 @@ func (s *DrawingStuff) ToPixels(positional base.Positional) base.Positional {
 
 func (s *DrawingStuff) ToPixelsXY(x float64, y float64) (float64, float64) {
 	return x * float64(s.UnitSize), y * float64(s.UnitSize)
+}
+
+func (s *DrawingStuff) DrawDebugPositionPoint(
+	position base.Positional,
+	screen *ebiten.Image,
+) {
+	// position point
+	pxls := s.ToPixels(position)
+	ebitenutil.DrawRect(screen, pxls.X, pxls.Y, 2, 2, color.RGBA{
+		R: 0x00,
+		G: 0xff,
+		B: 0x00,
+		A: 0xff,
+	})
+}
+
+func (s *DrawingStuff) DrawVolumeObject(
+	volumeObject base.VolumeObject,
+	position base.Positional,
+	rawImage *ebiten.Image,
+	screen *ebiten.Image,
+) {
+	io := &ebiten.DrawImageOptions{}
+
+	//scale
+	originalWidth, originalHeight := rawImage.Size()
+	requiredWidth := volumeObject.Width * float64(s.UnitSize)
+	requiredHeight := volumeObject.Height * float64(s.UnitSize)
+	scaleX := requiredWidth / float64(originalWidth)
+	scaleY := requiredHeight / float64(originalHeight)
+	io.GeoM.Scale(scaleX, scaleY)
+
+	//positionalByPivot
+	shiftForPivotX := -volumeObject.PivotRelativeX * volumeObject.Width
+	shiftForPivotY := -volumeObject.PivotRelativeY * volumeObject.Height
+	io.GeoM.Translate(s.ToPixelsXY(shiftForPivotX, shiftForPivotY))
+
+	//rotate
+	io.GeoM.Rotate(position.Angle)
+
+	//move to position
+	io.GeoM.Translate(s.ToPixelsXY(position.X, position.Y))
+
+	screen.DrawImage(rawImage, io)
 }
 
 //
