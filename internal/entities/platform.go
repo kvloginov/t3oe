@@ -2,7 +2,6 @@ package entities
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"math"
@@ -12,12 +11,23 @@ type Platform struct {
 	base.Physical
 	base.VolumeObject
 	Team
+
+	controller  PlatformController
+	rocketImage *ebiten.Image
 }
 
 const FLY_MAX_SPEED = 5
 
-func NewPlatform(positional base.Positional, team Team) Platform {
-	return Platform{
+func NewPlatform(positional base.Positional, team Team, controller PlatformController) *Platform {
+	var rocketImage *ebiten.Image
+	switch team {
+	case TEAM_BLUE:
+		rocketImage = drawing.ROCKET_BLUE_IMG
+	case TEAM_RED:
+		rocketImage = drawing.ROCKET_RED_IMG
+	}
+
+	return &Platform{
 		Physical: base.Physical{
 			Positional:                   positional,
 			DragCoefficient:              0.965,
@@ -29,26 +39,28 @@ func NewPlatform(positional base.Positional, team Team) Platform {
 			Width:          2,
 			Height:         1,
 		},
-		Team: team}
+		Team:        team,
+		controller:  controller,
+		rocketImage: rocketImage,
+	}
 }
 
 func (p *Platform) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff) {
-	drawingStuff.DrawVolumeObject(p.VolumeObject, p.Positional, drawing.ROCKET_IMG, screen)
+	drawingStuff.DrawVolumeObject(p.VolumeObject, p.Positional, p.rocketImage, screen)
 	drawingStuff.DrawDebugPositionPoint(p.Positional, screen)
 }
 
 func (p *Platform) Update(dt float64) {
-	if inpututil.KeyPressDuration(ebiten.KeyArrowUp) > 0 {
-		p.Speed = FLY_MAX_SPEED
-	}
-	if inpututil.KeyPressDuration(ebiten.KeyArrowDown) > 0 {
-		p.Speed = -FLY_MAX_SPEED
-	}
-	if inpututil.KeyPressDuration(ebiten.KeyArrowLeft) > 0 {
+	if p.controller.Left() {
 		p.TurningSpeed = -math.Pi
-	}
-	if inpututil.KeyPressDuration(ebiten.KeyArrowRight) > 0 {
+	} else if p.controller.Right() {
 		p.TurningSpeed = math.Pi
+	}
+
+	if p.controller.Forward() {
+		p.Speed = FLY_MAX_SPEED
+	} else if p.controller.Backward() {
+		p.Speed = -FLY_MAX_SPEED
 	}
 
 	p.Physical.Update(dt)

@@ -23,9 +23,6 @@ import (
 )
 
 const (
-	//screenWidth  = 640
-	//screenHeight = 480
-
 	fieldUnitsWidth  = 20
 	fieldUnitsHeight = 15
 

@@ -17,7 +17,8 @@ type DrawingStuff struct {
 }
 
 var (
-	ROCKET_IMG *ebiten.Image
+	ROCKET_BLUE_IMG *ebiten.Image
+	ROCKET_RED_IMG  *ebiten.Image
 )
 
 func NewDrawingStuff(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsHeight int, unitSize int) *DrawingStuff {
@@ -35,15 +36,21 @@ func NewDrawingStuff(screenWidth int, screenHeight int, fieldUnitsWidth int, fie
 }
 
 func initImages() {
-	file, err := resources.Images.Open("images/rocketUp.png")
+	ROCKET_BLUE_IMG = getImageByPath("images/rocketRed.png")
+	ROCKET_RED_IMG = getImageByPath("images/rocketBlue.png")
+}
+
+func getImageByPath(path string) *ebiten.Image {
+	img, err := resources.Images.Open(path)
 	if err != nil {
 		panic(err)
 	}
 
-	ROCKET_IMG, _, err = ebitenutil.NewImageFromReader(file)
+	ebitenImage, _, err := ebitenutil.NewImageFromReader(img)
 	if err != nil {
-		return
+		panic(err)
 	}
+	return ebitenImage
 }
 
 func (s *DrawingStuff) ToPixels(positional base.Positional) base.Positional {
@@ -97,13 +104,3 @@ func (s *DrawingStuff) DrawVolumeObject(
 
 	screen.DrawImage(rawImage, io)
 }
-
-//
-//func (s *DrawingStuff) ToGeoM(volumeObj base.VolumeObject) ebiten.GeoM {
-//	geom := ebiten.GeoM{}
-//	geom.Rotate(volumeObj.Angle)
-//
-//	//TODO: Продолжить тут
-//	return ebiten.GeoM{}
-//	//return base.NewPositional(movable.X*float64(s.UnitSize), movable.Y*float64(s.UnitSize))
-//}

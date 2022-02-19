@@ -1,9 +1,9 @@
 package entities
 
 const (
-	TEAM_UNDEFINED = 0
-	TEAM_UP        = 1
-	TEAM_DOWN      = 2
+	TEAM_UNDEFINED Team = iota
+	TEAM_BLUE
+	TEAM_RED
 )
 
 type Team int

@@ -5,21 +5,19 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/kvloginov/t3oe/internal/base"
+	"github.com/kvloginov/t3oe/internal/controllers"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"github.com/kvloginov/t3oe/internal/entities"
 )
 
 type Game struct {
-	platforms []entities.Platform
-	bullets   []entities.Bullet
+	gameObjects []GameObject
 
 	drawingStuff *drawing.DrawingStuff
 }
 
 func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsHeight int, unitSize int) *Game {
 	g := &Game{
-		platforms: make([]entities.Platform, 1, 1),
-		bullets:   make([]entities.Bullet, 0),
 		drawingStuff: drawing.NewDrawingStuff(
 			screenWidth,
 			screenHeight,
@@ -28,30 +26,36 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 			unitSize),
 	}
 
-	g.platforms[0] = entities.NewPlatform(
+	g.gameObjects = append(g.gameObjects, entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1), base.ANGLE_UP),
-		entities.TEAM_DOWN,
-	)
-	//g.platforms[1] = entities.NewPlatform(base.NewPositional(12, 5), entities.TEAM_DOWN)
+		entities.TEAM_BLUE,
+		controllers.NewDirectInputPlatformController(),
+	))
+
+	g.gameObjects = append(g.gameObjects, entities.NewPlatform(
+		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight/2), base.ANGLE_DOWN),
+		entities.TEAM_RED,
+		controllers.NewRandomPlatformController(),
+	))
 
 	return g
 }
 
 func (g *Game) Update() error {
-	//TODO: не использовать эту функцию т.к. написано, что только для дебуга.
-	//tps := ebiten.CurrentTPS()
+	//TODO: не всегда 60 фпс
 	dt := float64(1) / 60
 
-	for i, _ := range g.platforms {
-		g.platforms[i].Update(dt)
+	for i, _ := range g.gameObjects {
+		g.gameObjects[i].Update(dt)
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprint(ebiten.CurrentTPS()))
-	for i, _ := range g.platforms {
-		g.platforms[i].Draw(screen, g.drawingStuff)
+
+	for i, _ := range g.gameObjects {
+		g.gameObjects[i].Draw(screen, g.drawingStuff)
 	}
 }
 
