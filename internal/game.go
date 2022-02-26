@@ -8,11 +8,10 @@ import (
 	"github.com/kvloginov/t3oe/internal/controllers"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"github.com/kvloginov/t3oe/internal/entities"
+	"github.com/kvloginov/t3oe/internal/gameObjects"
 )
 
 type Game struct {
-	gameObjects []GameObject
-
 	drawingStuff *drawing.DrawingStuff
 }
 
@@ -25,18 +24,19 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 			fieldUnitsHeight,
 			unitSize),
 	}
-
-	g.gameObjects = append(g.gameObjects, entities.NewPlatform(
+	bluePlatform := entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1), base.ANGLE_UP),
 		entities.TEAM_BLUE,
 		controllers.NewDirectInputPlatformController(),
-	))
-
-	g.gameObjects = append(g.gameObjects, entities.NewPlatform(
+	)
+	redPlatform := entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight/2), base.ANGLE_DOWN),
 		entities.TEAM_RED,
 		controllers.NewRandomPlatformController(),
-	))
+	)
+
+	gameObjects.GameObjects.Register(bluePlatform)
+	gameObjects.GameObjects.Register(redPlatform)
 
 	return g
 }
@@ -44,9 +44,9 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 func (g *Game) Update() error {
 	//TODO: не всегда 60 фпс
 	dt := float64(1) / 60
-
-	for i, _ := range g.gameObjects {
-		g.gameObjects[i].Update(dt)
+	objects := gameObjects.GameObjects.GetAll()
+	for i, _ := range objects {
+		objects[i].Update(dt)
 	}
 	return nil
 }
@@ -54,8 +54,9 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprint(ebiten.CurrentTPS()))
 
-	for i, _ := range g.gameObjects {
-		g.gameObjects[i].Draw(screen, g.drawingStuff)
+	objects := gameObjects.GameObjects.GetAll()
+	for i, _ := range objects {
+		objects[i].Draw(screen, g.drawingStuff)
 	}
 }
 

@@ -1,4 +1,4 @@
-package internal
+package gameObjects
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
