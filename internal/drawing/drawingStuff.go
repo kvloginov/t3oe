@@ -17,8 +17,9 @@ type DrawingStuff struct {
 }
 
 var (
-	ROCKET_BLUE_IMG *ebiten.Image
-	ROCKET_RED_IMG  *ebiten.Image
+	ROCKET_BLUE_IMG   *ebiten.Image
+	ROCKET_RED_IMG    *ebiten.Image
+	SIMPLE_BULLET_IMG *ebiten.Image
 )
 
 func NewDrawingStuff(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsHeight int, unitSize int) *DrawingStuff {
@@ -38,6 +39,7 @@ func NewDrawingStuff(screenWidth int, screenHeight int, fieldUnitsWidth int, fie
 func initImages() {
 	ROCKET_BLUE_IMG = getImageByPath("images/rocketRed.png")
 	ROCKET_RED_IMG = getImageByPath("images/rocketBlue.png")
+	SIMPLE_BULLET_IMG = getImageByPath("images/bullet.png")
 }
 
 func getImageByPath(path string) *ebiten.Image {

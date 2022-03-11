@@ -23,15 +23,14 @@ func NewBullet(pos base.Positional, team Team) *Bullet {
 		VolumeObject: base.VolumeObject{
 			PivotRelativeX: 0.5,
 			PivotRelativeY: 0.5,
-			Width:          0,
-			Height:         0,
+			Width:          24 / float64(64),
+			Height:         16 / float64(64),
 		},
 		Team: team}
 }
 
 func (p *Bullet) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff) {
-
-	//drawingStuff.DrawVolumeObject(p.VolumeObject, p.Positional, p.rocketImage, screen)
+	drawingStuff.DrawVolumeObject(p.VolumeObject, p.Positional, drawing.SIMPLE_BULLET_IMG, screen)
 	drawingStuff.DrawDebugPositionPoint(p.Positional, screen)
 }
 

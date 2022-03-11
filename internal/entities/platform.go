@@ -44,7 +44,7 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 		Team:        team,
 		controller:  controller,
 		rocketImage: rocketImage,
-		gun:         NewGun(time.Second/2, team),
+		gun:         NewGun(time.Second/4, team),
 	}
 }
 
