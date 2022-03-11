@@ -2,7 +2,6 @@ package entities
 
 import (
 	"github.com/kvloginov/t3oe/internal/base"
-	"github.com/kvloginov/t3oe/internal/gameObjects"
 	"log"
 	"time"
 )
@@ -20,8 +19,7 @@ func NewGun(shootDelay time.Duration, team Team) *Gun {
 func (g *Gun) PullTheTrigger(shootFrom base.Positional) {
 	if g.canShoot {
 		log.Println("SHOT!")
-		bullet := NewBullet(base.CopyPositional(shootFrom), g.team)
-		gameObjects.GameObjects.Register(bullet)
+		NewBullet(base.CopyPositional(shootFrom), g.team)
 
 		g.canShoot = false
 		go g.reload()

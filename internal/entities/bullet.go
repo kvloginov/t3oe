@@ -1,9 +1,12 @@
 package entities
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
+	"github.com/kvloginov/t3oe/internal/gameObjects"
+	"github.com/kvloginov/t3oe/internal/trigger"
 )
 
 const SIMPLE_BULLET_SPEED = 20
@@ -12,10 +15,11 @@ type Bullet struct {
 	base.VolumeObject
 	base.Physical
 	Team
+	NamedEntity
 }
 
 func NewBullet(pos base.Positional, team Team) *Bullet {
-	return &Bullet{
+	bul := &Bullet{
 		Physical: base.Physical{
 			Positional: pos,
 			Speed:      base.NewVectorWithAngle(pos.Angle).MultiplyScalar(SIMPLE_BULLET_SPEED),
@@ -27,6 +31,20 @@ func NewBullet(pos base.Positional, team Team) *Bullet {
 			Height:         16 / float64(64),
 		},
 		Team: team}
+
+	id := gameObjects.GameObjects.RegisterWithGeneratedId(bul)
+	trigger.RegisterTrigger(bul, bul.Width, func(object1 interface{}, object2 interface{}) {
+		switch object2.(type) {
+		case HasTeam:
+			if object2.(HasTeam).GetTeam() != bul.GetTeam() {
+				fmt.Printf("BABAH!")
+				gameObjects.GameObjects.Destroy(id)
+				trigger.DeleteTriggers(id)
+			}
+		}
+	})
+
+	return bul
 }
 
 func (p *Bullet) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff) {

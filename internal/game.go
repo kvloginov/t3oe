@@ -9,6 +9,7 @@ import (
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"github.com/kvloginov/t3oe/internal/entities"
 	"github.com/kvloginov/t3oe/internal/gameObjects"
+	"github.com/kvloginov/t3oe/internal/trigger"
 )
 
 type Game struct {
@@ -24,19 +25,17 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 			fieldUnitsHeight,
 			unitSize),
 	}
-	bluePlatform := entities.NewPlatform(
+	entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1), base.ANGLE_UP),
 		entities.TEAM_BLUE,
 		controllers.NewDirectInputPlatformController(),
 	)
-	redPlatform := entities.NewPlatform(
+	entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight/2), base.ANGLE_DOWN),
 		entities.TEAM_RED,
-		controllers.NewRandomPlatformController(),
+		//controllers.NewRandomPlatformController(),
+		controllers.NewEmptyPlatformController(),
 	)
-
-	gameObjects.GameObjects.Register(bluePlatform)
-	gameObjects.GameObjects.Register(redPlatform)
 
 	return g
 }
@@ -48,6 +47,9 @@ func (g *Game) Update() error {
 	for i, _ := range objects {
 		objects[i].Update(dt)
 	}
+
+	trigger.CheckTriggers()
+
 	return nil
 }
 

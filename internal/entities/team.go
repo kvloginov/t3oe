@@ -7,3 +7,7 @@ const (
 )
 
 type Team int
+
+func (t Team) GetTeam() Team {
+	return t
+}

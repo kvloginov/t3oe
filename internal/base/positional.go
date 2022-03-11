@@ -33,3 +33,7 @@ func CopyPositional(from Positional) Positional {
 		Angle: from.Angle,
 	}
 }
+
+func (p *Positional) GetPosition() Vector {
+	return p.Pos
+}

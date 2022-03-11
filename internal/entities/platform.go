@@ -4,6 +4,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
+	"github.com/kvloginov/t3oe/internal/gameObjects"
+	"github.com/kvloginov/t3oe/internal/trigger"
 	"math"
 	"time"
 )
@@ -12,6 +14,7 @@ type Platform struct {
 	base.Physical
 	base.VolumeObject
 	Team
+	NamedEntity
 
 	controller  PlatformController
 	rocketImage *ebiten.Image
@@ -29,7 +32,7 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 		rocketImage = drawing.ROCKET_RED_IMG
 	}
 
-	return &Platform{
+	pl := &Platform{
 		Physical: base.Physical{
 			Positional:                   positional,
 			DragCoefficient:              0.3,
@@ -46,6 +49,10 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 		rocketImage: rocketImage,
 		gun:         NewGun(time.Second/4, team),
 	}
+
+	pl.name = gameObjects.GameObjects.RegisterWithGeneratedId(pl)
+	trigger.RegisterTrigger(pl, 1, nil)
+	return pl
 }
 
 func (p *Platform) Draw(screen *ebiten.Image, drawingStuff *drawing.DrawingStuff) {
