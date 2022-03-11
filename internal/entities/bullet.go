@@ -18,7 +18,7 @@ func NewBullet(pos base.Positional, team Team) *Bullet {
 	return &Bullet{
 		Physical: base.Physical{
 			Positional: pos,
-			Speed:      SIMPLE_BULLET_SPEED,
+			Speed:      base.NewVectorWithAngle(pos.Angle).MultiplyScalar(SIMPLE_BULLET_SPEED),
 		},
 		VolumeObject: base.VolumeObject{
 			PivotRelativeX: 0.5,

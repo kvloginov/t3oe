@@ -1,35 +1,46 @@
 package base
 
-import "math"
-
 type Physical struct {
 	Positional
 
-	Speed        float64
-	TurningSpeed float64 // radians/sec
+	Speed           Vector
+	Acceleration    Vector
+	DragCoefficient float64
 
-	Acceleration float64
-	Torque       float64 // radians/sec2
-
-	DragCoefficient              float64 // just * acceleration to X and Y
+	TurningSpeed                 float64 // radians/sec
+	Torque                       float64 // radians/sec2
 	TurningResistanceCoefficient float64
 }
 
 func (p *Physical) Update(dt float64) {
-	p.Speed += p.Acceleration * dt
-
+	// moving
+	// A
 	if p.DragCoefficient != 0 {
-		p.Speed *= p.DragCoefficient
+		spLen := p.Speed.Length()
+		force := p.DragCoefficient * spLen * spLen
+		acc := p.Speed.WithLength(force)
+		p.Acceleration = p.Acceleration.Minus(acc)
 	}
+	// V
+	p.Speed = p.Speed.Plus(p.Acceleration.MultiplyScalar(dt))
+	// X
+	p.Pos = p.Pos.Plus(p.Speed.MultiplyScalar(dt))
 
-	p.Positional.X += p.Speed * math.Cos(p.Positional.Angle) * dt
-	p.Positional.Y += p.Speed * math.Sin(p.Positional.Angle) * dt
-
+	// turning
+	// ε
+	// ω
 	if p.TurningResistanceCoefficient != 0 {
 		p.TurningSpeed *= p.TurningResistanceCoefficient
 	}
 	p.TurningSpeed += p.Torque * dt
+	// φ
 	p.Positional.Angle += p.TurningSpeed * dt
+
+	// reset acceleration
+	p.Acceleration = Vector{
+		X: 0,
+		Y: 0,
+	}
 }
 
 func NewPhysicalByPos(positional Positional) *Physical {

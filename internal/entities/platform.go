@@ -18,7 +18,7 @@ type Platform struct {
 	gun         *Gun
 }
 
-const FLY_MAX_SPEED = 5
+const PLATFORM_ACCELERATION = 20
 
 func NewPlatform(positional base.Positional, team Team, controller PlatformController) *Platform {
 	var rocketImage *ebiten.Image
@@ -32,7 +32,7 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 	return &Platform{
 		Physical: base.Physical{
 			Positional:                   positional,
-			DragCoefficient:              0.965,
+			DragCoefficient:              0.3,
 			TurningResistanceCoefficient: 0.950,
 		},
 		VolumeObject: base.VolumeObject{
@@ -61,9 +61,9 @@ func (p *Platform) Update(dt float64) {
 	}
 
 	if p.controller.Forward() {
-		p.Speed = FLY_MAX_SPEED
+		p.Acceleration = base.NewVectorWithAngle(p.Positional.Angle).MultiplyScalar(PLATFORM_ACCELERATION)
 	} else if p.controller.Backward() {
-		p.Speed = -FLY_MAX_SPEED
+		p.Acceleration = base.NewVectorWithAngle(p.Positional.Angle).MultiplyScalar(-PLATFORM_ACCELERATION)
 	}
 
 	if p.controller.Shoot() {

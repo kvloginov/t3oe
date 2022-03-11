@@ -37,8 +37,8 @@ func NewDrawingStuff(screenWidth int, screenHeight int, fieldUnitsWidth int, fie
 }
 
 func initImages() {
-	ROCKET_BLUE_IMG = getImageByPath("images/rocketRed.png")
-	ROCKET_RED_IMG = getImageByPath("images/rocketBlue.png")
+	ROCKET_BLUE_IMG = getImageByPath("images/rocketBlue.png")
+	ROCKET_RED_IMG = getImageByPath("images/rocketRed.png")
 	SIMPLE_BULLET_IMG = getImageByPath("images/bullet.png")
 }
 
@@ -56,7 +56,7 @@ func getImageByPath(path string) *ebiten.Image {
 }
 
 func (s *DrawingStuff) ToPixels(positional base.Positional) base.Positional {
-	return base.NewPositional(positional.X*float64(s.UnitSize), positional.Y*float64(s.UnitSize), 0)
+	return base.NewPositional(positional.Pos.X*float64(s.UnitSize), positional.Pos.Y*float64(s.UnitSize), 0)
 }
 
 func (s *DrawingStuff) ToPixelsXY(x float64, y float64) (float64, float64) {
@@ -69,7 +69,7 @@ func (s *DrawingStuff) DrawDebugPositionPoint(
 ) {
 	// position point
 	pxls := s.ToPixels(position)
-	ebitenutil.DrawRect(screen, pxls.X, pxls.Y, 2, 2, color.RGBA{
+	ebitenutil.DrawRect(screen, pxls.Pos.X, pxls.Pos.Y, 2, 2, color.RGBA{
 		R: 0x00,
 		G: 0xff,
 		B: 0x00,
@@ -102,7 +102,7 @@ func (s *DrawingStuff) DrawVolumeObject(
 	io.GeoM.Rotate(position.Angle)
 
 	//move to position
-	io.GeoM.Translate(s.ToPixelsXY(position.X, position.Y))
+	io.GeoM.Translate(s.ToPixelsXY(position.Pos.X, position.Pos.Y))
 
 	screen.DrawImage(rawImage, io)
 }

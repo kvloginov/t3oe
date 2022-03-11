@@ -7,7 +7,7 @@ import (
 )
 
 // GameObjects UVAGA global object
-var GameObjects *gameObjects = newGameObjects()
+var GameObjects = newGameObjects()
 
 var errGameObjectNameIsInvalid = errors.New("global object name is invalid")
 
