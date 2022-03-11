@@ -18,3 +18,8 @@ type Positional struct {
 func NewPositional(x float64, y float64, angle float64) Positional {
 	return Positional{X: x, Y: y, Angle: angle}
 }
+
+func CopyPositional(from Positional) Positional {
+	// ok we could just return `from`
+	return Positional{X: from.X, Y: from.Y, Angle: from.Angle}
+}

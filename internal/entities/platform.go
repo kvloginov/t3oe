@@ -5,6 +5,7 @@ import (
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"math"
+	"time"
 )
 
 type Platform struct {
@@ -14,6 +15,7 @@ type Platform struct {
 
 	controller  PlatformController
 	rocketImage *ebiten.Image
+	gun         *Gun
 }
 
 const FLY_MAX_SPEED = 5
@@ -42,6 +44,7 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 		Team:        team,
 		controller:  controller,
 		rocketImage: rocketImage,
+		gun:         NewGun(time.Second/2, team),
 	}
 }
 
@@ -61,6 +64,10 @@ func (p *Platform) Update(dt float64) {
 		p.Speed = FLY_MAX_SPEED
 	} else if p.controller.Backward() {
 		p.Speed = -FLY_MAX_SPEED
+	}
+
+	if p.controller.Shoot() {
+		p.gun.PullTheTrigger(p.Positional)
 	}
 
 	p.Physical.Update(dt)

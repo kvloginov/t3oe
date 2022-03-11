@@ -26,6 +26,10 @@ type randomPlatformController struct {
 	currentTurning  turning
 }
 
+func (d *randomPlatformController) Shoot() bool {
+	return false
+}
+
 func NewRandomPlatformController() *randomPlatformController {
 	controller := &randomPlatformController{}
 

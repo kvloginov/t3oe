@@ -27,3 +27,7 @@ func (d *directInputPlatformController) Left() bool {
 func (d *directInputPlatformController) Right() bool {
 	return inpututil.KeyPressDuration(ebiten.KeyArrowRight) > 0
 }
+
+func (d *directInputPlatformController) Shoot() bool {
+	return inpututil.KeyPressDuration(ebiten.KeySpace) > 0
+}

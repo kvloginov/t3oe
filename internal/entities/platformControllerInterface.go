@@ -5,4 +5,5 @@ type PlatformController interface {
 	Backward() bool
 	Left() bool
 	Right() bool
+	Shoot() bool
 }
