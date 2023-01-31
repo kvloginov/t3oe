@@ -27,7 +27,7 @@ type randomPlatformController struct {
 }
 
 func (d *randomPlatformController) Shoot() bool {
-	return false
+	return true
 }
 
 func NewRandomPlatformController() *randomPlatformController {

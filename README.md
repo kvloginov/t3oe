@@ -1,2 +1,2 @@
 # t3oe
-super-fast tic-tac-toe
+A simple 1-vs-1 space shooter

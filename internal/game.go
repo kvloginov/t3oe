@@ -33,8 +33,7 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 	entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight/2), base.ANGLE_DOWN),
 		entities.TEAM_RED,
-		//controllers.NewRandomPlatformController(),
-		controllers.NewEmptyPlatformController(),
+		controllers.NewRandomPlatformController(),
 	)
 
 	return g
@@ -56,8 +55,8 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprint(ebiten.CurrentTPS()))
 
-	objects := gameObjects.GameObjects.GetAll()
-	for i, _ := range objects {
+	objects := gameObjects.GameObjects.Sorted()
+	for i := range objects {
 		objects[i].Draw(screen, g.drawingStuff)
 	}
 }

@@ -3,6 +3,8 @@ package gameObjects
 import (
 	"errors"
 	"github.com/google/uuid"
+	"sort"
+	"strings"
 )
 
 // GameObjects UVAGA global object
@@ -39,6 +41,20 @@ func (g *gameObjects) RegisterWithGeneratedId(object GameObject) string {
 
 func (g *gameObjects) GetAll() map[string]GameObject {
 	return g.objects
+}
+
+func (g *gameObjects) Sorted() []GameObject {
+	arr := make([]GameObject, 0, len(g.objects))
+
+	for _, o := range g.objects {
+		arr = append(arr, o)
+	}
+
+	sort.Slice(arr, func(i, j int) bool {
+		return strings.Compare(arr[i].GetName(), arr[j].GetName()) > 0
+	})
+
+	return arr
 }
 
 func (g *gameObjects) generateUniqueKey() string {
