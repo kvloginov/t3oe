@@ -2,9 +2,11 @@ package gameObjects
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"sort"
 	"strings"
+	"sync"
+
+	"github.com/google/uuid"
 )
 
 // GameObjects UVAGA global object
@@ -14,6 +16,7 @@ var errGameObjectNameIsInvalid = errors.New("global object name is invalid")
 
 type gameObjects struct {
 	objects map[string]GameObject
+	mu      sync.RWMutex
 }
 
 func newGameObjects() *gameObjects {
@@ -24,6 +27,9 @@ func newGameObjects() *gameObjects {
 
 // RegisterWithGeneratedId registers new global object with randomized name, returns its name in result and sets it by HasName interface
 func (g *gameObjects) RegisterWithGeneratedId(object GameObject) string {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	
 	uniqueKey := g.generateUniqueKey()
 	object.SetName(uniqueKey)
 	g.objects[uniqueKey] = object
@@ -40,10 +46,21 @@ func (g *gameObjects) RegisterWithGeneratedId(object GameObject) string {
 //}
 
 func (g *gameObjects) GetAll() map[string]GameObject {
-	return g.objects
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	
+	// Create a copy of the map for safe return
+	result := make(map[string]GameObject, len(g.objects))
+	for k, v := range g.objects {
+		result[k] = v
+	}
+	return result
 }
 
 func (g *gameObjects) Sorted() []GameObject {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	
 	arr := make([]GameObject, 0, len(g.objects))
 
 	for _, o := range g.objects {
@@ -63,5 +80,8 @@ func (g *gameObjects) generateUniqueKey() string {
 }
 
 func (g *gameObjects) Destroy(name string) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	
 	delete(g.objects, name)
 }

@@ -1,13 +1,14 @@
 package entities
 
 import (
+	"math"
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kvloginov/t3oe/internal/base"
 	"github.com/kvloginov/t3oe/internal/drawing"
 	"github.com/kvloginov/t3oe/internal/gameObjects"
 	"github.com/kvloginov/t3oe/internal/trigger"
-	"math"
-	"time"
 )
 
 type Platform struct {
@@ -19,6 +20,7 @@ type Platform struct {
 	controller  PlatformController
 	rocketImage *ebiten.Image
 	gun         *Gun
+	thruster    *Thruster
 }
 
 const PLATFORM_ACCELERATION = 20
@@ -48,6 +50,7 @@ func NewPlatform(positional base.Positional, team Team, controller PlatformContr
 		controller:  controller,
 		rocketImage: rocketImage,
 		gun:         NewGun(time.Second/4, team),
+		thruster:    NewThruster(team),
 	}
 
 	pl.name = gameObjects.GameObjects.RegisterWithGeneratedId(pl)
@@ -69,6 +72,7 @@ func (p *Platform) Update(dt float64) {
 
 	if p.controller.Forward() {
 		p.Acceleration = base.NewVectorWithAngle(p.Positional.Angle).MultiplyScalar(PLATFORM_ACCELERATION)
+		p.thruster.Activate(p.Positional)
 	} else if p.controller.Backward() {
 		p.Acceleration = base.NewVectorWithAngle(p.Positional.Angle).MultiplyScalar(-PLATFORM_ACCELERATION)
 	}
@@ -78,4 +82,8 @@ func (p *Platform) Update(dt float64) {
 	}
 
 	p.Physical.Update(dt)
+}
+
+func (p *Platform) SetController(controller PlatformController) {
+	p.controller = controller
 }
