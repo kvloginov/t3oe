@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/kvloginov/t3oe/internal/base"
@@ -13,7 +14,10 @@ import (
 )
 
 type Game struct {
-	drawingStuff *drawing.DrawingStuff
+	drawingStuff   *drawing.DrawingStuff
+	playerPlatform *entities.Platform
+	aiPlatform     *entities.Platform
+	aiController   *controllers.AIPlatformController
 }
 
 func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsHeight int, unitSize int) *Game {
@@ -25,16 +29,29 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 			fieldUnitsHeight,
 			unitSize),
 	}
-	entities.NewPlatform(
+
+	// Create player platform
+	g.playerPlatform = entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight-1), base.ANGLE_UP),
 		entities.TEAM_BLUE,
 		controllers.NewDirectInputPlatformController(),
 	)
-	entities.NewPlatform(
+
+	// Create AI platform with temporary controller
+	g.aiPlatform = entities.NewPlatform(
 		base.NewPositional(float64(fieldUnitsWidth/2), float64(fieldUnitsHeight/2), base.ANGLE_DOWN),
 		entities.TEAM_RED,
-		controllers.NewRandomPlatformController(),
+		nil, // will be set later
 	)
+
+	// Create AI controller that will track the player
+	// TODO: think that sharing a pointer to the object may be a bad idea - this object can be deleted
+	g.aiController = controllers.NewAIPlatformController(
+		&g.aiPlatform.Positional,
+		&g.playerPlatform.Positional,
+	)
+	// Replace the AI platform's controller with our smart AI controller
+	g.aiPlatform.SetController(g.aiController)
 
 	return g
 }
@@ -42,6 +59,7 @@ func NewGame(screenWidth int, screenHeight int, fieldUnitsWidth int, fieldUnitsH
 func (g *Game) Update() error {
 	//TODO: не всегда 60 фпс
 	dt := float64(1) / 60
+
 	objects := gameObjects.GameObjects.GetAll()
 	for i, _ := range objects {
 		objects[i].Update(dt)

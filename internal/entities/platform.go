@@ -83,3 +83,7 @@ func (p *Platform) Update(dt float64) {
 
 	p.Physical.Update(dt)
 }
+
+func (p *Platform) SetController(controller PlatformController) {
+	p.controller = controller
+}
