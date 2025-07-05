@@ -4,3 +4,7 @@
 A simple 1-vs-1 space shooter written in Go using ebiten library
 
 ![](https://github.com/kvloginov/t3oe/blob/main/docs/t3oe-gameplay.gif?raw=true)
+
+## Documentation
+
+- [Architecture Guide](docs/architecture.md) - Technical documentation for game architecture and entity creation
